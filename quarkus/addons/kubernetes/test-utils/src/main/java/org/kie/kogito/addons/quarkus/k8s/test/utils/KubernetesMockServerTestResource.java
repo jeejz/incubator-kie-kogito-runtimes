@@ -37,8 +37,8 @@ public class KubernetesMockServerTestResource implements QuarkusTestResourceLife
 
     @Override
     public Map<String, String> start() {
-        // Create and start the mock server (no-arg constructor for Fabric8 7.x)
-        server = new KubernetesMockServer();
+        // Create mock server with CRUD mode enabled (Fabric8 7.x)
+        server = new KubernetesMockServer(false);
         server.init();
 
         // Create client from the mock server
