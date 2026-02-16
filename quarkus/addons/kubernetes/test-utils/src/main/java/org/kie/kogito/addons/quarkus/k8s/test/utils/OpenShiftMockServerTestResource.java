@@ -29,13 +29,8 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 /**
- * Quarkus 3.27.2 / Fabric8 7.3.1 upgrade:
- * - The openshift-server-mock artifact and OpenShiftMockServer class were removed in Fabric8 7.x.
- * - Replaced with KubernetesMockServer + client.adapt(OpenShiftClient.class).
- * - Uses KubernetesCrudDispatcher for CRUD mode (auto-handles POST/GET/PUT/DELETE).
- * - The single-boolean constructor KubernetesMockServer(boolean) sets useHttps, NOT crudMode.
- * - Uses io.fabric8.mockwebserver.Context (fully qualified to avoid clash with
- * QuarkusTestResourceLifecycleManager.Context).
+ * Quarkus test resource that provides a Fabric8 Kubernetes mock server with OpenShift support.
+ * Uses KubernetesMockServer with CRUD mode and adapts the client to OpenShiftClient.
  */
 public class OpenShiftMockServerTestResource implements QuarkusTestResourceLifecycleManager {
 
@@ -45,9 +40,6 @@ public class OpenShiftMockServerTestResource implements QuarkusTestResourceLifec
 
     @Override
     public Map<String, String> start() {
-        // Fabric8 7.3.1: Create mock server with CRUD mode via KubernetesCrudDispatcher.
-        // Context is fully qualified to avoid clash with QuarkusTestResourceLifecycleManager.Context.
-        // useHttps=false to avoid SSL handshake overhead in tests.
         server = new KubernetesMockServer(
                 new io.fabric8.mockwebserver.Context(),
                 new MockWebServer(),
@@ -56,7 +48,6 @@ public class OpenShiftMockServerTestResource implements QuarkusTestResourceLifec
                 false);
         server.init();
 
-        // Fabric8 7.x: createClient() replaces getClient(), adapt() replaces createOpenShiftClient()
         kubernetesClient = server.createClient();
         openShiftClient = kubernetesClient.adapt(OpenShiftClient.class);
 

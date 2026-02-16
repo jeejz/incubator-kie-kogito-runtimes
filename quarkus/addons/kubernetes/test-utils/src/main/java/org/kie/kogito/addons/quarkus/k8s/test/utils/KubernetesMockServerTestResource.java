@@ -30,28 +30,16 @@ import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 /**
  * Quarkus test resource that provides a Fabric8 Kubernetes mock server with CRUD support.
- *
- * Quarkus 3.27.2 / Fabric8 7.3.1 upgrade:
- * - Replaced KubernetesServer (Fabric8 6.x) with KubernetesMockServer (Fabric8 7.x).
- * - before()/after() lifecycle replaced with init()/destroy().
- * - Client creation changed from server.getClient() to server.createClient().
- * - CRUD mode now requires explicit KubernetesCrudDispatcher. The single-boolean
- * constructor KubernetesMockServer(boolean) sets useHttps, NOT crudMode.
- * - The responses map must be a mutable HashMap (not Collections.emptyMap()).
- * - Uses io.fabric8.mockwebserver.Context (fully qualified to avoid clash with
- * QuarkusTestResourceLifecycleManager.Context).
  */
 public class KubernetesMockServerTestResource implements QuarkusTestResourceLifecycleManager {
 
     private static final String TEST_NAMESPACE = "serverless-workflow-greeting-quarkus";
-    private static KubernetesMockServer server;
+    private KubernetesMockServer server;
     private KubernetesClient client;
+    private String previousMasterUrl;
 
     @Override
     public Map<String, String> start() {
-        // Fabric8 7.3.1: Create mock server with CRUD mode via KubernetesCrudDispatcher.
-        // Context is fully qualified to avoid clash with QuarkusTestResourceLifecycleManager.Context.
-        // useHttps=false to avoid SSL handshake overhead in tests.
         server = new KubernetesMockServer(
                 new io.fabric8.mockwebserver.Context(),
                 new MockWebServer(),
@@ -60,10 +48,10 @@ public class KubernetesMockServerTestResource implements QuarkusTestResourceLife
                 false);
         server.init();
 
-        // Fabric8 7.x: createClient() replaces getClient() from Fabric8 6.x
         client = server.createClient();
         String mockServerUrl = client.getConfiguration().getMasterUrl();
 
+        previousMasterUrl = System.getProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY);
         System.setProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY, mockServerUrl);
 
         Map<String, String> config = new HashMap<>();
@@ -75,6 +63,11 @@ public class KubernetesMockServerTestResource implements QuarkusTestResourceLife
 
     @Override
     public void stop() {
+        if (previousMasterUrl != null) {
+            System.setProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY, previousMasterUrl);
+        } else {
+            System.clearProperty(Config.KUBERNETES_MASTER_SYSTEM_PROPERTY);
+        }
         if (client != null) {
             client.close();
         }
@@ -84,7 +77,7 @@ public class KubernetesMockServerTestResource implements QuarkusTestResourceLife
         }
     }
 
-    public static KubernetesMockServer getServer() {
+    public KubernetesMockServer getServer() {
         return server;
     }
 

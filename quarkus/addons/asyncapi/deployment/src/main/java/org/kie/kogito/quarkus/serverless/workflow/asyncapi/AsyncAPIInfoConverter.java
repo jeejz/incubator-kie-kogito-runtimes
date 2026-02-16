@@ -27,7 +27,6 @@ import org.kie.kogito.serverless.workflow.asyncapi.AsyncChannelInfo;
 import org.kie.kogito.serverless.workflow.asyncapi.AsyncInfo;
 import org.kie.kogito.serverless.workflow.asyncapi.AsyncInfoConverter;
 
-// Updated to AsyncAPI v3.0.0 (from v2.0.0) as part of Quarkus 3.27.2 upgrade
 import com.asyncapi.v3._0_0.model.AsyncAPI;
 import com.asyncapi.v3._0_0.model.channel.Channel;
 import com.asyncapi.v3._0_0.model.operation.Operation;
@@ -54,7 +53,9 @@ public class AsyncAPIInfoConverter implements AsyncInfoConverter {
         return new AsyncInfo(channelInfoByOperationId);
     }
 
-    // AsyncAPI v3.0.0: channels are separate top-level objects with addresses
+    /**
+     * Builds a mapping from channel ID to its address from the AsyncAPI channels.
+     */
     private static Map<String, String> buildChannelAddressMap(AsyncAPI asyncApi) {
         Map<String, String> channelIdToAddress = new HashMap<>();
         if (asyncApi.getChannels() != null) {
@@ -69,7 +70,9 @@ public class AsyncAPIInfoConverter implements AsyncInfoConverter {
         return channelIdToAddress;
     }
 
-    // AsyncAPI v3.0.0: operations reference channels via $ref, action is SEND/RECEIVE
+    /**
+     * Builds a mapping from operation ID to {@link AsyncChannelInfo} by resolving channel references.
+     */
     private static Map<String, AsyncChannelInfo> buildOperationChannelInfoMap(AsyncAPI asyncApi, Map<String, String> channelIdToAddress) {
         Map<String, AsyncChannelInfo> channelInfoByOperationId = new HashMap<>();
         if (asyncApi.getOperations() != null) {

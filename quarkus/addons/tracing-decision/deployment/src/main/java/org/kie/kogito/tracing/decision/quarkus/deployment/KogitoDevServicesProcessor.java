@@ -231,6 +231,11 @@ public class KogitoDevServicesProcessor {
             return null;
         }
 
+        if (config.imageName == null) {
+            LOGGER.warn("No TrustyService image name configured, unable to start DevServices.");
+            return null;
+        }
+
         final Optional<ContainerAddress> maybeContainerAddress = LOCATOR.locateContainer(config.serviceName,
                 config.shared,
                 launchMode.getLaunchMode());

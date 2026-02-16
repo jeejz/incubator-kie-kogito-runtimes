@@ -53,8 +53,6 @@
     <version.com.fasterxml.jackson>2.19.2</version.com.fasterxml.jackson>
     <version.com.fasterxml.jackson.databind>2.19.2</version.com.fasterxml.jackson.databind>
     <version.com.jayway.jsonpath>2.9.0</version.com.jayway.jsonpath>
-    <!-- Quarkus 3.27.2 upgrade: Vert.x 4.5.23 requires scram-client 3.2 (not client 2.1).
-         The artifact was renamed from com.ongres.scram:client (2.x) to com.ongres.scram:scram-client (3.x). -->
     <version.com.ongres.scram>3.2</version.com.ongres.scram>
     <version.net.minidev.jsonsmart>2.4.10</version.net.minidev.jsonsmart>
     <version.net.thisptr.jackson-jq>1.0.0-preview.20240207</version.net.thisptr.jackson-jq>
@@ -64,7 +62,7 @@
     <version.io.quarkiverse.reactivemessaging.http>2.5.0-lts</version.io.quarkiverse.reactivemessaging.http>
     <version.io.quarkiverse.embedded.postgresql>0.7.2</version.io.quarkiverse.embedded.postgresql>
     <version.com.github.haifengl.smile>1.5.2</version.com.github.haifengl.smile>
-    <version.com.github.javaparser>3.26.4</version.com.github.javaparser>
+    <version.com.github.javaparser>3.27.0</version.com.github.javaparser>
     <version.com.fasterxml.jackson.datatype>2.19.2</version.com.fasterxml.jackson.datatype>
     <version.com.github.victools>4.37.0</version.com.github.victools>
     <version.org.wiremock>3.13.0</version.org.wiremock>
@@ -90,10 +88,6 @@
     Kubernetes addons since they use a different version.
     -->
     <version.io.fabric8.kubernetes-client>7.3.1</version.io.fabric8.kubernetes-client>
-    <!-- Quarkus 3.27.2 upgrade: version.io.fabric8.openshift-mock property removed.
-         The openshift-server-mock artifact was removed in Fabric8 7.x (see MIGRATION-v7.md).
-         Use io.fabric8:kubernetes-server-mock instead, which is already declared below
-         at version ${version.io.fabric8.kubernetes-client}. -->
     <version.io.micrometer>1.14.12</version.io.micrometer>
     <version.org.flywaydb>11.14.1</version.org.flywaydb>
     <version.org.postgresql>42.7.8</version.org.postgresql>
@@ -136,7 +130,7 @@
     <version.org.mongo-image>5.0.31</version.org.mongo-image>
     <version.org.mozilla.rhino>1.8.1</version.org.mozilla.rhino>
     <version.org.redis>2.0.4</version.org.redis>
-    <!-- Upgraded from 15.9-alpine3.20 to 16.8-alpine3.21 for Quarkus 3.20+ compatibility - PostgreSQL 16.8+ required for SASL authentication protocol -->
+    <!-- PostgreSQL 16.8+ required for SASL authentication protocol -->
     <version.org.postgres>16.8-alpine3.21</version.org.postgres>
     <!-- we align to version used by quarkus -->
     <version.org.apache.avro>1.12.0</version.org.apache.avro>
@@ -157,7 +151,7 @@
     <version.org.mvel>2.5.2.Final</version.org.mvel>
     <version.org.reactivestreams>1.0.4</version.org.reactivestreams>
     <version.org.reflections>0.10.2</version.org.reflections>
-    <version.org.slf4j>2.0.6</version.org.slf4j>
+    <version.org.slf4j>2.0.17</version.org.slf4j>
 
     <version.maven>3.9.11</version.maven>
     <version.maven.project>2.2.1</version.maven.project>
@@ -833,10 +827,6 @@
         <version>${version.io.fabric8.kubernetes-client}</version>
       </dependency>
 
-      <!-- Quarkus 3.27.2 upgrade: Removed io.fabric8:openshift-server-mock dependency.
-           The artifact was removed in Fabric8 7.x. Use io.fabric8:kubernetes-server-mock (above)
-           with KubernetesMockServer + client.adapt(OpenShiftClient.class) instead of OpenShiftMockServer. -->
-
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
@@ -981,9 +971,7 @@
         <version>${version.org.wiremock}</version>
         <scope>test</scope>
       </dependency>
-      <!-- Quarkus 3.27.2 / Vert.x 4.5.23 upgrade: SCRAM authentication for PostgreSQL 16+.
-           Artifact renamed from com.ongres.scram:client (2.x) to com.ongres.scram:scram-client (3.x).
-           Vert.x 4.5.23 was compiled against scram-client 3.2 API (ScramClient$MechanismsBuildStage). -->
+      <!-- SCRAM authentication for PostgreSQL 16+; required by Vert.x reactive pg-client -->
       <dependency>
         <groupId>com.ongres.scram</groupId>
         <artifactId>scram-client</artifactId>

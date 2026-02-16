@@ -58,7 +58,7 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Execution(SAME_THREAD)
-@Disabled("Disabled temporarly - when doing quarkus upgrade.")
+@Disabled("Disabled temporarily - live reload tests are unstable in dev mode")
 public class LiveReloadProcessorTest {
 
     private static final int PORT = SocketUtils.findAvailablePort();
