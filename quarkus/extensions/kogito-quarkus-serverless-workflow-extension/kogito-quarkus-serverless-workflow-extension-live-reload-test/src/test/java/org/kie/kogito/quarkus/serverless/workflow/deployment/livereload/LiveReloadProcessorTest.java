@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -52,6 +53,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
@@ -174,7 +176,7 @@ public class LiveReloadProcessorTest {
     }
 
     @Test
-    void testAsyncApi() throws IOException, InterruptedException {
+    void testAsyncApi() throws IOException {
         given()
                 .contentType(ContentType.JSON)
                 .when()
@@ -187,21 +189,18 @@ public class LiveReloadProcessorTest {
             test.addResourceFile("asyncPublisher.sw.json", new String(Objects.requireNonNull(inputStream).readAllBytes()));
         }
 
-        // Add a small delay to allow Quarkus to complete the hot reload
-        Thread.sleep(500);
+        // Wait for Quarkus to complete the hot reload (max 10 seconds)
+        await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
+            String id = given()
+                    .contentType(ContentType.JSON)
+                    .when()
+                    .body(Collections.singletonMap("workflowdata", Collections.emptyMap()))
+                    .post("/asyncEventPublisher")
+                    .then()
+                    .statusCode(201)
+                    .extract().path("id");
 
-        String id = given()
-                .contentType(ContentType.JSON)
-                .when()
-                .body(Collections.singletonMap("workflowdata", Collections.emptyMap()))
-                .post("/asyncEventPublisher")
-                .then()
-                .statusCode(201)
-                .extract().path("id");
-
-        assertThat(id).isNotBlank();
-
-        // Add a small delay before test cleanup to avoid ConcurrentModificationException
-        Thread.sleep(100);
+            assertThat(id).isNotBlank();
+        });
     }
 }

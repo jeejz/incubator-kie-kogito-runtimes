@@ -64,8 +64,6 @@ public class TaskInputsEntityMapper implements EntityMapper {
                 inputEntity.setValue(JSONUtils.valueToString(value).getBytes(StandardCharsets.UTF_8));
                 inputEntity.setJavaType(value.getClass().getName());
             }
-            // No explicit persist needed: parent has @OneToMany(cascade = CascadeType.ALL),
-            // so child entities are automatically persisted when the parent is saved.
         });
     }
 

@@ -21,11 +21,6 @@ package org.kie.kogito.quarkus.config;
 import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
 
-/**
- * Nested configuration group for eventing runtime settings.
- * Note: @ConfigGroup is not used here because this interface is nested within a @ConfigMapping interface.
- * In Quarkus 3.x, @ConfigGroup is only for legacy @ConfigRoot + @ConfigItem style configurations.
- */
 public interface KogitoEventingRuntimeConfig {
 
     String MAX_THREADS_PROPERTY = "threads.poolSize";
